@@ -16,6 +16,7 @@ The _setup-environment.ps1_ PowerShell script sets up an environment within your
 2. A DESTINATION Azure SQL Database Server
 3. An Azure Data Factory instance
 
+## Azure Data Factory ARM Template
 You may use the included _arm_template.zip_ file and Import it into Azure Data Factory to recreate the entire factory, with pipelines, datasets and linked services (datastore connections).
 
 __Note: When importing the Data Factory ARM Template, you will be forced to specify Azure SQL Database connection strings and must provide values specific for YOUR environment.__
