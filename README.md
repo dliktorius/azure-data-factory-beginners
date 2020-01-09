@@ -5,7 +5,7 @@ This repository contains a PowerShell script and Azure Resource Manager (ARM) Te
 ## Getting Started
 Please download the PowerShell script, ARM template and SQL script files into the same folder.  Optionally, upload the PowerShell script and ARM template into Azure CloudShell for ease of use.  Otherwise, when running locally you will need to first authenticate against Azure within PowerShell prior to running the script. 
 
-__Disclaimers: The script requires editing, but has comments throughtout to guide you.  Niether I nor any associated party will be liable for any negative, unwanted or unexpected effects as a result of you downloading or running the scripts in this repository.__
+__Disclaimers: The script requires editing, but has comments throughtout to guide you.  Neither I nor any associated party will be liable for any negative, unwanted or unexpected effects as a result of you downloading or running the scripts in this repository.  Please review and understand what the script performs before executing it.__
 
 __Note: Resources deployed within Microsoft Azure can and will incur costs you will be liable for.__
 
@@ -19,4 +19,8 @@ The _setup-environment.ps1_ PowerShell script sets up an environment within your
 ## Azure Data Factory ARM Template
 You may use the included _arm_template.zip_ file and Import it into Azure Data Factory to recreate the entire factory, with pipelines, datasets and linked services (datastore connections).
 
-__Note: When importing the Data Factory ARM Template, you will be forced to specify Azure SQL Database connection strings and must provide values specific for YOUR environment.__
+__Note: When importing the Data Factory ARM Template, you will be forced to specify Azure SQL Database connection strings and must provide values specific for YOUR environment.__  You can obtain a sample connection string for each Azure SQL Database from the Connection Strings blade within the Azure Portal for said database server.
+
+## SQL Scripts
+The _Sales Orders Queries.sql_ script file contains queries used during the demo.
+The _DeltaSyncDemo.sql_ script file contains statements used to create the table and stored procedure used by the _DeltaSyncPipeline_.
