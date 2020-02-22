@@ -1,0 +1,537 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+            "defaultValue": "azdatafactory20200105"
+        },
+        "AzureSqlSourceDatabase_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'AzureSqlSourceDatabase'"
+        },
+        "AzureSqlDestinationDatabase_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'AzureSqlDestinationDatabase'"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/SalesOrdersDestination')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlDestinationDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": "Sales",
+                    "table": "Orders"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDestinationDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/SalesOrdersSource')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlSourceDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "OrderID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "CustomerID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "SalespersonPersonID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "PickedByPersonID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "ContactPersonID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "BackorderOrderID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "OrderDate",
+                        "type": "date"
+                    },
+                    {
+                        "name": "ExpectedDeliveryDate",
+                        "type": "date"
+                    },
+                    {
+                        "name": "CustomerPurchaseOrderNumber",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "IsUndersupplyBackordered",
+                        "type": "bit"
+                    },
+                    {
+                        "name": "Comments",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "DeliveryInstructions",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "InternalComments",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "PickingCompletedWhen",
+                        "type": "datetime2",
+                        "scale": 7
+                    },
+                    {
+                        "name": "LastEditedBy",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "LastEditedWhen",
+                        "type": "datetime2",
+                        "scale": 7
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "Sales",
+                    "table": "Orders"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlSourceDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlSourceDatabase')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('AzureSqlSourceDatabase_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlDestinationDatabase')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('AzureSqlDestinationDatabase_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/CopySalesOrdersPipeline')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Copy-SalesOrders",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "tableOption": "autoCreate"
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "OrderID",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "OrderID",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "CustomerID",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "CustomerID",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "SalespersonPersonID",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "SalespersonPersonID"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "PickedByPersonID",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "PickedByPersonID",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ContactPersonID",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "ContactPersonID",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "BackorderOrderID",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "BackorderOrderID",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "OrderDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "OrderDateMapped"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "ExpectedDeliveryDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "ExpectedDeliveryDate",
+                                            "type": "DateTime"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "CustomerPurchaseOrderNumber",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "CustomerPurchaseOrderNumber",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "IsUndersupplyBackordered",
+                                            "type": "Boolean"
+                                        },
+                                        "sink": {
+                                            "name": "IsUndersupplyBackordered",
+                                            "type": "Boolean"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Comments",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Comments",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "DeliveryInstructions",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "DeliveryInstructions",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "InternalComments",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "InternalComments",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "PickingCompletedWhen",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "PickingCompletedWhen",
+                                            "type": "DateTime"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LastEditedBy",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "LastEditedBy",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "LastEditedWhen",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "LastEditedWhen",
+                                            "type": "DateTime"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "SalesOrdersSource",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "SalesOrdersDestination",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    }
+                ],
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/SalesOrdersSource')]",
+                "[concat(variables('factoryId'), '/datasets/SalesOrdersDestination')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DeltaSyncPipeline')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "LookupWatermark",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": "SELECT WatermarkValue FROM WatermarkTable",
+                                "queryTimeout": "02:00:00"
+                            },
+                            "dataset": {
+                                "referenceName": "SalesOrdersDestination",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    },
+                    {
+                        "name": "LookupMaxOrderID",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": "SELECT TOP(1) MAX(OrderID) AS MaxOrderID FROM Sales.Orders\n",
+                                "queryTimeout": "02:00:00"
+                            },
+                            "dataset": {
+                                "referenceName": "SalesOrdersSource",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    },
+                    {
+                        "name": "CopyNewOrders",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "LookupWatermark",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "LookupMaxOrderID",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM Sales.Orders\nWHERE OrderID > @{activity('LookupWatermark').output.firstRow.WatermarkValue}",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "tableOption": "autoCreate"
+                            },
+                            "enableStaging": false
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "SalesOrdersSource",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "SalesOrdersDestination",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "UpdateWatermark",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "CopyNewOrders",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[dbo].[update_watermark]",
+                            "storedProcedureParameters": {
+                                "OrderID": {
+                                    "value": {
+                                        "value": "@activity('LookupMaxOrderID').output.firstRow.MaxOrderID",
+                                        "type": "Expression"
+                                    },
+                                    "type": "Int32"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDestinationDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/SalesOrdersDestination')]",
+                "[concat(variables('factoryId'), '/datasets/SalesOrdersSource')]",
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDestinationDatabase')]"
+            ]
+        }
+    ]
+}
