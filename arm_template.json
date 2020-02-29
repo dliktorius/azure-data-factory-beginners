@@ -5,7 +5,7 @@
         "factoryName": {
             "type": "string",
             "metadata": "Data Factory name",
-            "defaultValue": "azdatafactory20200105"
+            "defaultValue": "adfdemofactoryb2e01d0948f0"
         },
         "AzureSqlSourceDatabase_connectionString": {
             "type": "secureString",
@@ -20,148 +20,6 @@
         "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
     },
     "resources": [
-        {
-            "name": "[concat(parameters('factoryName'), '/SalesOrdersDestination')]",
-            "type": "Microsoft.DataFactory/factories/datasets",
-            "apiVersion": "2018-06-01",
-            "properties": {
-                "linkedServiceName": {
-                    "referenceName": "AzureSqlDestinationDatabase",
-                    "type": "LinkedServiceReference"
-                },
-                "annotations": [],
-                "type": "AzureSqlTable",
-                "schema": [],
-                "typeProperties": {
-                    "schema": "Sales",
-                    "table": "Orders"
-                }
-            },
-            "dependsOn": [
-                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDestinationDatabase')]"
-            ]
-        },
-        {
-            "name": "[concat(parameters('factoryName'), '/SalesOrdersSource')]",
-            "type": "Microsoft.DataFactory/factories/datasets",
-            "apiVersion": "2018-06-01",
-            "properties": {
-                "linkedServiceName": {
-                    "referenceName": "AzureSqlSourceDatabase",
-                    "type": "LinkedServiceReference"
-                },
-                "annotations": [],
-                "type": "AzureSqlTable",
-                "schema": [
-                    {
-                        "name": "OrderID",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "CustomerID",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "SalespersonPersonID",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "PickedByPersonID",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "ContactPersonID",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "BackorderOrderID",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "OrderDate",
-                        "type": "date"
-                    },
-                    {
-                        "name": "ExpectedDeliveryDate",
-                        "type": "date"
-                    },
-                    {
-                        "name": "CustomerPurchaseOrderNumber",
-                        "type": "nvarchar"
-                    },
-                    {
-                        "name": "IsUndersupplyBackordered",
-                        "type": "bit"
-                    },
-                    {
-                        "name": "Comments",
-                        "type": "nvarchar"
-                    },
-                    {
-                        "name": "DeliveryInstructions",
-                        "type": "nvarchar"
-                    },
-                    {
-                        "name": "InternalComments",
-                        "type": "nvarchar"
-                    },
-                    {
-                        "name": "PickingCompletedWhen",
-                        "type": "datetime2",
-                        "scale": 7
-                    },
-                    {
-                        "name": "LastEditedBy",
-                        "type": "int",
-                        "precision": 10
-                    },
-                    {
-                        "name": "LastEditedWhen",
-                        "type": "datetime2",
-                        "scale": 7
-                    }
-                ],
-                "typeProperties": {
-                    "schema": "Sales",
-                    "table": "Orders"
-                }
-            },
-            "dependsOn": [
-                "[concat(variables('factoryId'), '/linkedServices/AzureSqlSourceDatabase')]"
-            ]
-        },
-        {
-            "name": "[concat(parameters('factoryName'), '/AzureSqlSourceDatabase')]",
-            "type": "Microsoft.DataFactory/factories/linkedServices",
-            "apiVersion": "2018-06-01",
-            "properties": {
-                "annotations": [],
-                "type": "AzureSqlDatabase",
-                "typeProperties": {
-                    "connectionString": "[parameters('AzureSqlSourceDatabase_connectionString')]"
-                }
-            },
-            "dependsOn": []
-        },
-        {
-            "name": "[concat(parameters('factoryName'), '/AzureSqlDestinationDatabase')]",
-            "type": "Microsoft.DataFactory/factories/linkedServices",
-            "apiVersion": "2018-06-01",
-            "properties": {
-                "annotations": [],
-                "type": "AzureSqlDatabase",
-                "typeProperties": {
-                    "connectionString": "[parameters('AzureSqlDestinationDatabase_connectionString')]"
-                }
-            },
-            "dependsOn": []
-        },
         {
             "name": "[concat(parameters('factoryName'), '/CopySalesOrdersPipeline')]",
             "type": "Microsoft.DataFactory/factories/pipelines",
@@ -365,7 +223,10 @@
                             {
                                 "referenceName": "SalesOrdersDestination",
                                 "type": "DatasetReference",
-                                "parameters": {}
+                                "parameters": {
+                                    "Schema": "Sales",
+                                    "Table": "Orders"
+                                }
                             }
                         ]
                     }
@@ -404,7 +265,10 @@
                             "dataset": {
                                 "referenceName": "SalesOrdersDestination",
                                 "type": "DatasetReference",
-                                "parameters": {}
+                                "parameters": {
+                                    "Schema": "Sales",
+                                    "Table": "Orders"
+                                }
                             }
                         }
                     },
@@ -484,7 +348,10 @@
                             {
                                 "referenceName": "SalesOrdersDestination",
                                 "type": "DatasetReference",
-                                "parameters": {}
+                                "parameters": {
+                                    "Schema": "Sales",
+                                    "Table": "Orders"
+                                }
                             }
                         ]
                     },
@@ -518,6 +385,378 @@
                                     "type": "Int32"
                                 }
                             }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDestinationDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/SalesOrdersDestination')]",
+                "[concat(variables('factoryId'), '/datasets/SalesOrdersSource')]",
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDestinationDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/SalesOrdersSource')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlSourceDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "OrderID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "CustomerID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "SalespersonPersonID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "PickedByPersonID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "ContactPersonID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "BackorderOrderID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "OrderDate",
+                        "type": "date"
+                    },
+                    {
+                        "name": "ExpectedDeliveryDate",
+                        "type": "date"
+                    },
+                    {
+                        "name": "CustomerPurchaseOrderNumber",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "IsUndersupplyBackordered",
+                        "type": "bit"
+                    },
+                    {
+                        "name": "Comments",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "DeliveryInstructions",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "InternalComments",
+                        "type": "nvarchar"
+                    },
+                    {
+                        "name": "PickingCompletedWhen",
+                        "type": "datetime2",
+                        "scale": 7
+                    },
+                    {
+                        "name": "LastEditedBy",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "LastEditedWhen",
+                        "type": "datetime2",
+                        "scale": 7
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "Sales",
+                    "table": "Orders"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlSourceDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/SalesOrdersDestination')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlDestinationDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "parameters": {
+                    "Schema": {
+                        "type": "string"
+                    },
+                    "Table": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [],
+                "typeProperties": {
+                    "schema": {
+                        "value": "@dataset().Schema",
+                        "type": "Expression"
+                    },
+                    "table": {
+                        "value": "@dataset().Table",
+                        "type": "Expression"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDestinationDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlSourceDatabase')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('AzureSqlSourceDatabase_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlDestinationDatabase')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('AzureSqlDestinationDatabase_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DeltaSyncByDatePipeline')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "LookupWatermark",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": "SELECT WatermarkValue FROM WatermarkTable",
+                                "queryTimeout": "02:00:00"
+                            },
+                            "dataset": {
+                                "referenceName": "SalesOrdersDestination",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "Schema": "Sales",
+                                    "Table": "Orders"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "LookupEditedOrders",
+                        "type": "Lookup",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": "SELECT TOP(1) MAX(LastEditedWhen) AS LastEditedWhen FROM Sales.Orders\n",
+                                "queryTimeout": "02:00:00"
+                            },
+                            "dataset": {
+                                "referenceName": "SalesOrdersSource",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        }
+                    },
+                    {
+                        "name": "CopyNewOrders",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "DropStagingTable",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureSqlSource",
+                                "sqlReaderQuery": {
+                                    "value": "SELECT * FROM Sales.Orders\nWHERE LastEditedWhen > '@{activity('LookupWatermark').output.firstRow.WatermarkValue}'",
+                                    "type": "Expression"
+                                },
+                                "queryTimeout": "02:00:00"
+                            },
+                            "sink": {
+                                "type": "AzureSqlSink",
+                                "tableOption": "autoCreate"
+                            },
+                            "enableStaging": false
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "SalesOrdersSource",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "SalesOrdersDestination",
+                                "type": "DatasetReference",
+                                "parameters": {
+                                    "Schema": "Staging",
+                                    "Table": "Sales_Orders"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "UpdateWatermark",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "Merge",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[dbo].[update_watermark]",
+                            "storedProcedureParameters": {
+                                "LastEditedWhen": {
+                                    "value": {
+                                        "value": "@activity('LookupEditedOrders').output.firstRow.LastEditedWhen",
+                                        "type": "Expression"
+                                    },
+                                    "type": "Datetime"
+                                }
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDestinationDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "Merge",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "CopyNewOrders",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[dbo].[Sales_Orders_Merge]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDestinationDatabase",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "DropStagingTable",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "LookupWatermark",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "LookupEditedOrders",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[[dbo].[Drop_Staging_Sales_Orders]"
                         },
                         "linkedServiceName": {
                             "referenceName": "AzureSqlDestinationDatabase",
