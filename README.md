@@ -4,6 +4,7 @@ This repository contains a PowerShell script and Azure Resource Manager (ARM) Te
 * Microsoft Data and AI User Group at the Microsoft LATAM office in Fort Lauderdale, FL.
 * SQL Saturday #946 South Florida BI Edition (2020)
 * South Florida Software Developers Conference 2020
+* SQL Saturday #1080 South Florida (2024)
 
 ## Getting Started
 Please download the PowerShell script at a minimum.  It will use the ARM .json template file at the root of this repository to deploy the Azure Data Factory after deploying two Azure SQL Database instances (a source and a destination).  Optionally, upload the PowerShell script and ARM template into Azure CloudShell.  You will need to first authenticate against Azure when promopted while running the script. 
