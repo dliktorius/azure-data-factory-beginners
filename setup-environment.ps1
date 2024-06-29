@@ -267,7 +267,7 @@ if(!$sourceDatabase) {
 	$importRequest = New-AzSqlDatabaseImport -ResourceGroupName $resourceGroupName `
 		-ServerName $sourceServerName `
 		-DatabaseName $sourceDatabaseName `
-		-DatabaseMaxSizeBytes "262144000" `
+		-DatabaseMaxSizeBytes 2147483648 `
 		-StorageKeyType "StorageAccessKey" `
 		-StorageKey $storageAccountKey `
 		-StorageUri "https://$storageaccountname.blob.core.windows.net/$storageContainerName/$bacpacFilename" `
